@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# while loop that loops from 1 to 10 and displays:
+# bad luck for the 4th loop iteration
+# good luck for the 8th loop iteration
+# Best School for the other iterations
+
+china=0
+
+while [ $china -lt 10 ]
+do
+  if [ $china -eq 3 ]
+  then
+    echo "bad luck"
+  elif [ $china -eq 7 ]
+  then
+    echo "good luck"
+  else
+    echo "Best School"
+  fi
+  (( china++ ))
+done
