@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# custom 404 page that contains the string
+
+#make updates before installation
+sudo apt-get update
+#installing nginx
+sudo apt-get -y install nginx
+
+#Creating an index.html page
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+#Performing a 301-redirection
+string_for_replacement="server_name_;\n\trewrite ^\/redirect_me https:\/\/github.com\/Amanda-Amata permanent;"
+sudo sed -i "s/server_name_;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+#create a 404 custom error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+new_string="listen 80 default_server;\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\troot \/var\/www\/html;\n\t\tinternal;\n\t}"
+sudo sed -i "s/listen 80 default_server;/$new_string/" /etc/nginx/sites-enabled/default
+
+#testing config for syntax errors
+sudo nginx -t
+
+#Restarting Nginx after implementing changes
+sudo service nginx restart
