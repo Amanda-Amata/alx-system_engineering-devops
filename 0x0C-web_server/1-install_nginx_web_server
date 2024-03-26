@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # list of commands that will Installing nginx on web-01
 
-#make updates before installation
-sudo apt-get update
-#installing nginx
-sudo apt-get -y install nginx
+#update and install nginx
+echo -e "Updating and installing Nginx.\n"
+sudo apt-get update -y -qq && \
+	 sudo apt-get install nginx -y
+
+echo -e "\nSetting up some minor stuff.\n"
 
 # starting nginx service
 sudo service nginx start
@@ -17,7 +19,8 @@ sudo chown -R "$USER":"$USER" /var/www/html
 sudo chmod -R 755 /var/www
 
 #Creating an index.html page
-echo -e "Hello World!" | sudo tee /var/www/html/index.html
+echo -e "Hello World!" | dd status=none of=/var/www/html/index.nginx-debian.html
+
 
 #testing Nginx config for syntax errors
 sudo nginx -t
