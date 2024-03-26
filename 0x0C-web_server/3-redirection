@@ -1,17 +1,30 @@
 #!/usr/bin/env bash
 # configuring a new ubuntu machine to perform a 301-redirection
 
-#make updates before installation
-sudo apt-get update
-#installing nginx
-sudo apt-get -y install nginx
+echo -e "Updating and installing Nginx.\n"
+sudo apt-get update -y -qq && \
+         sudo apt-get install nginx -y
 
-#Creating an index.html page
-echo "Hello World!" | sudo tee /var/www/html/index.html
+echo -e "\nSetting up some minor stuff.\n"
 
-#Performing a 301-redirection
-string_for_replacement="server_name_;\n\trewrite ^\/redirect_me https:\/\/github.com\/Amanda-Amata permanent;"
-sudo sed -i "s/server_name_;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+# starting nginx service
+sudo service nginx start
 
-#Restarting Nginx services
+# allowing nginx on firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Give the user ownership to website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
+
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
+
+# Creating new index
+echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
+
+# Setting up /redirect_me to a youtube video
+sudo sed -i '24i\       rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+
+# Restarting nginx
 sudo service nginx restart
