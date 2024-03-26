@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # list of commands that will Installing nginx on web-01
 
-#update and install nginx
 echo -e "Updating and installing Nginx.\n"
 sudo apt-get update -y -qq && \
 	 sudo apt-get install nginx -y
@@ -18,12 +17,11 @@ sudo ufw allow 'Nginx HTTP'
 sudo chown -R "$USER":"$USER" /var/www/html
 sudo chmod -R 755 /var/www
 
-#Creating an index.html page
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
+
+# Creating new index page
 echo -e "Hello World!" | dd status=none of=/var/www/html/index.nginx-debian.html
 
-
-#testing Nginx config for syntax errors
-sudo nginx -t
-
-#Restarting Nginx
+# Restarting nginx
 sudo service nginx restart
