@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 #Configure HAproxy so that it send traffic to web-01 and web-02
+#Configure HAproxy so that it send traffic to web-01 and web-02
+#Distribute requests using a roundrobin algorithm
+#HAproxy can be managed via an init script
 
 #install HAproxy on a server
-apt-get update
-apt-get install software-properties-common -y
-add-apt-repository ppa:vbernat/haproxy-1.7 -y
-apt-get update
-apt-get install haproxy=1.7.\* -y
+sudo apt-get update
+sudo apt-get install software-properties-common -y
+sudo apt-get update
+sudo apt-get install -y haproxy
+
+echo "ENABLED=1" >> /etc/default/haproxy
+touch /etc/haproxy/haproxy.cfg
 
 #configure haproxy configuration file to distribute requests using a roundrobin algorithm
-echo '
+echo "
 frontend amandabiotech.tech
 	bind 0:80
 	default_backend web_servers
@@ -18,7 +23,7 @@ backend web_servers
 	balance roundrobin
         server 462740-web-01 54.160.75.184:80
         server 462740-web-02 54.160.66.133:80
-' | sudo tee -a /etc/haproxy/haproxy.cfg
+" >> /etc/haproxy/haproxy.cfg
 
 # Restart HAproxy service
-sudo /etc/init.d/haproxy restart
+sudo service haproxy restart
