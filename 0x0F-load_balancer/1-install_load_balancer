@@ -13,9 +13,9 @@ frontend amandabiotech.tech
 
 backend web_servers
 	balance roundrobin
-        server 64820-web-01 100.26.152.157:80
-        server 64820-web-02 52.86.102.6:80
-' >> /etc/haproxy/haproxy.cfg
+        server 462740-web-01 54.160.75.184:80
+        server 462740-web-02 54.160.66.133:80
+' | sudo tee -a /etc/haproxy/haproxy.cfg
 
 # Restart HAproxy service
-service haproxy restart
+sudo service haproxy restart
