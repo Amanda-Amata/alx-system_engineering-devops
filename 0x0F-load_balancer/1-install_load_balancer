@@ -1,29 +1,59 @@
 #!/usr/bin/env bash
 #Configure HAproxy so that it send traffic to web-01 and web-02
-#Configure HAproxy so that it send traffic to web-01 and web-02
 #Distribute requests using a roundrobin algorithm
 #HAproxy can be managed via an init script
 
-#install HAproxy on a server
-sudo apt-get update
-sudo apt-get install software-properties-common -y
-sudo apt-get update
-sudo apt-get install -y haproxy
+echo -e "updating...\n"
 
-echo "ENABLED=1" >> /etc/default/haproxy
-touch /etc/haproxy/haproxy.cfg
+function install() {
+        command -v "$1" &> /dev/null
+
+        #shellcheck disable=SC2181
+        if [ $? -ne 0 ]; then
+                echo -e "       Installing: $1\n"
+                sudo apt-get update -y -qq && \
+                        sudo apt-get install -y "$1" -qq
+                echo -e "\n"
+        else
+                echo -e "       ${1} is already installed.\n"
+        fi
+}
+
+install haproxy #install haproxy
+
+echo -e "\nSetting up some minor stuff.\n"
+
+# backup default server config file
+sudo cp /etc/haproxy/haproxy.cfg haproxy_default.backup
+
+#enable haproxy to start with init script
+echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
 
 #configure haproxy configuration file to distribute requests using a roundrobin algorithm
-echo "
+"
+defaults
+        mode http
+        timeout client 15s
+        timeout connect 10s
+	timeout server 15s
+        timeout http-request 10s
+
 frontend amandabiotech.tech
-	bind 0:80
-	default_backend web_servers
+        bind *:80
+        default_backend web_servers
 
 backend web_servers
-	balance roundrobin
+        balance roundrobin
         server 462740-web-01 54.160.75.184:80
         server 462740-web-02 54.160.66.133:80
-" >> /etc/haproxy/haproxy.cfg
+"
+# shellcheck disable=SC2154
+echo "$server_config" | sudo dd status=none of=/etc/haproxy/haproxy.cfg
 
-# Restart HAproxy service
-sudo service haproxy restart
+echo "configured - Roundrobin On web-01 & web-02"
+
+if [ "$(pgrep -c haproxy)" -le 0 ]; then
+        sudo service haproxy start
+else
+        sudo service haproxy restart
+fi
