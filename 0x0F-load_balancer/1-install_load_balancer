@@ -26,29 +26,29 @@ echo -e "\nSetting up some minor stuff.\n"
 # backup default server config file
 sudo cp /etc/haproxy/haproxy.cfg haproxy_default.backup
 
-#enable haproxy to start with init script
-echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
-
 #configure haproxy configuration file to distribute requests using a roundrobin algorithm
 "
 defaults
         mode http
         timeout client 15s
         timeout connect 10s
-	timeout server 15s
+        timeout server 15s
         timeout http-request 10s
 
-frontend amandabiotech.tech
+frontend amanda-frontend
         bind *:80
-        default_backend web_servers
+        default_backend amanda-backend
 
-backend web_servers
+backend amanda-backend
         balance roundrobin
-        server 462740-web-01 54.160.75.184:80
-        server 462740-web-02 54.160.66.133:80
+        server 462740-web-01 54.160.75.184:80 check
+        server 462740-web-02 54.160.66.133:80 check
 "
 # shellcheck disable=SC2154
 echo "$server_config" | sudo dd status=none of=/etc/haproxy/haproxy.cfg
+
+#enable haproxy to start with init script
+echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
 
 echo "configured - Roundrobin On web-01 & web-02"
 
