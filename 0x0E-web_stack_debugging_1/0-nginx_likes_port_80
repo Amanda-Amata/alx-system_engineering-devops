@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#script that configures ubuntu to listen to port 80 of all the server’s active IPv4 IPs
+
+#rm the first config nginx default file,
+#& creates a new config default file that -s to port 80 on active IPv4 IPs  
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+#restarts nginx
+sudo service nginx restart
