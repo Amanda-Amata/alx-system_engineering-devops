@@ -40,7 +40,7 @@ frontend amanda-frontend
         default_backend amanda-backend
 
 frontend amanda-frontend-https
-        bind *:443 ssl crt /etc/haproxy/certs/amandabiotech.tech.pem
+        bind *:443 ssl crt /etc/haproxy/certs/www.amandabiotech.tech.pem
         http-request set-header X-Forwarded-Proto https
         default_backend amanda-backend
 
