@@ -1,24 +1,38 @@
 server {
-                listen 80 default_server;
+                
+		#serve this page both locally and on its public IP on port 80
+		listen 80 default_server;
                 listen [::]:80 default_server;
 
+		#config server web-01
                 server_name 54.160.75.184;
                 add_header X-Served-By 462740-web-01;
-                location = /airbnb-onepage/ {
+                
+		#proxy requests to the process listening on port 5000
+		location = /airbnb-onepage/ {
                         proxy_pass http://127.0.0.1:5000/airbnb-onepage;
                 }
+
+		#proxy requests to the route /airbnb-dynamic/number_odd_or_even/(any integer)
 		location = /airbnb-dynamic/number_odd_or_even/(\d+)$ {
                         proxy_pass http://127.0.0.1:5000/airbnb-onepage/$1;
                 }
+
+		#route /api/ points to a Gunicorn instance listening on port 5002
 		location = /api {
                         proxy_pass http://127.0.0.1:5002/api;
                 }
+
+		#serve content from web_dynamic/2-hbnb.py on port 5003
                 location = / {
                         proxy_pass http://127.0.0.1:5003/2-hbnb;
                 }
+
+		#serves the static assets found in web_dynamic/static/
                 location = /static {
                         alias web_dynamic/static/;
                 }
+		#handles error not found
                 error_page 404 /404.html;
                 location = /404 {
                         root /var/www/html;
